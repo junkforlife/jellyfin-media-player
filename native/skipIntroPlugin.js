@@ -1,4 +1,6 @@
-let tvIntro;
+let skipSegments;
+let userInterfaceConfiguration;
+let currentSegment = "None";
 
 class skipIntroPlugin {
     constructor({ events, playbackManager, ServerConnections }) {
@@ -57,11 +59,10 @@ class skipIntroPlugin {
 
             document.head.insertAdjacentHTML('beforeend', stylesheet);
 
-
             const skipIntroHtml = `
             <div class="skipIntro hide">
                 <button is="paper-icon-button-light" class="btnSkipIntro paper-icon-button-light">
-                    Skip Intro
+                    <span id="btnSkipSegmentText"></span>
                     <span class="material-icons skip_next"></span>
                 </button>
             </div>
@@ -97,7 +98,6 @@ class skipIntroPlugin {
                 if (!document.querySelector('.skipIntro .btnSkipIntro')) {
                     playerContainer.insertAdjacentHTML('afterend', skipIntroHtml);
                 }
-
                 document.querySelector('.skipIntro .btnSkipIntro').addEventListener('click', handleClick, { useCapture: true });
 
                 if (window.PointerEvent) {
@@ -107,29 +107,56 @@ class skipIntroPlugin {
                     }, { useCapture: true });
                 }
             }
-
             
             function onPlayback(e, player, state) {
                 if (state.NowPlayingItem) {
-                    getIntroTimestamps(state.NowPlayingItem);
+                    getIntroSkipperSegments(state.NowPlayingItem);
+                    getUserInterfaceConfiguration();
 
                     const onTimeUpdate = async () => {
-                        // Check if an introduction sequence was detected for this item.
-                        if (!tvIntro?.Valid) {
+                        if (!skipSegments) {
                             return;
                         }
 
-                        const seconds = playbackManager.currentTime(player) / 1000;
-
-                        await injectSkipIntroHtml(); // I have trust issues
                         const skipIntro = document.querySelector(".skipIntro");
-    
-                        // If the skip prompt should be shown, show it.
-                        if (seconds >= tvIntro.ShowSkipPromptAt && seconds < tvIntro.HideSkipPromptAt) {
-                            skipIntro.classList.remove("hide");
-                            return;
-                        }
 
+                        for (let key in skipSegments) {
+                            const segment = skipSegments[key];
+                            if (!segment?.Valid) {
+                                return;
+                            }
+
+                            const seconds = playbackManager.currentTime(player) / 1000;
+
+                            await injectSkipIntroHtml(); // I have trust issues
+                            
+                            // If the skip prompt should be shown, show it.
+                            if (seconds >= segment.ShowSkipPromptAt && seconds < segment.HideSkipPromptAt) {
+                                skipIntro.classList.remove("hide");
+
+                                const skipButton = document.querySelector('.skipIntro .btnSkipIntro');
+                                if (!skipButton) {
+                                    return;
+                                }
+
+                                if (userInterfaceConfiguration) {
+                                    currentSegment = key;
+                                    switch (currentSegment) {
+                                        case "Introduction":
+                                            skipButton.querySelector("#btnSkipSegmentText").textContent =
+                                                userInterfaceConfiguration.SkipButtonIntroText;
+                                            break;
+                                        case "Credits":
+                                            skipButton.querySelector("#btnSkipSegmentText").textContent =
+                                                userInterfaceConfiguration.SkipButtonEndCreditsText;
+                                            break;
+                                        default:
+                                            console.log("Skipping non-existant section");
+                                    }
+                                }
+                                return;
+                            }
+                        }
                         skipIntro.classList.add("hide");
                     };
 
@@ -143,15 +170,14 @@ class skipIntroPlugin {
                 }
             };
             events.on(playbackManager, 'playbackstart', onPlayback);
-            
 
-            function getIntroTimestamps(item) {
+            function getIntroSkipperSegments(item) {
                 const apiClient = ServerConnections
                     ? ServerConnections.currentApiClient()
                     : window.ApiClient;
                 const address = apiClient.serverAddress();
 
-                const url = `${address}/Episode/${item.Id}/IntroTimestamps`;
+                const url = `${address}/Episode/${item.Id}/IntroSkipperSegments`;
                 const reqInit = {
                     headers: {
                         "Authorization": `MediaBrowser Token=${apiClient.accessToken()}`
@@ -160,18 +186,47 @@ class skipIntroPlugin {
 
                 fetch(url, reqInit).then(r => {
                     if (!r.ok) {
-                        tvIntro = null;
+                        skipSegments = null;
                         return;
                     }
 
                     return r.json();
-                }).then(intro => {
-                    tvIntro = intro;
-                }).catch(err => { tvIntro = null; });
+                }).then(segments => {
+                    skipSegments = segments;
+                }).catch(err => { skipSegments = null; });
+            }
+
+            function getUserInterfaceConfiguration() {
+                const apiClient = ServerConnections
+                    ? ServerConnections.currentApiClient()
+                    : window.ApiClient;
+                const address = apiClient.serverAddress();
+
+                const url = `${address}/Intros/UserInterfaceConfiguration`;
+                const reqInit = {
+                    headers: {
+                        "Authorization": `MediaBrowser Token=${apiClient.accessToken()}`
+                    }
+                };
+
+                fetch(url, reqInit).then(r => {
+                    if (!r.ok) {
+                        userInterfaceConfiguration = null;
+                        return;
+                    }
+
+                    return r.json();
+                }).then(config => {
+                    userInterfaceConfiguration = config;
+                }).catch(err => { userInterfaceConfiguration = null; });
             }
 
             function skipIntro() {
-                playbackManager.seekMs(tvIntro.IntroEnd * 1000);
+                if (currentSegment === "None") {
+                    console.log("Not skipping non-existant section");
+                    return;
+                }
+                playbackManager.seekMs(skipSegments[currentSegment].IntroEnd * 1000);
             }
         })();
     }
