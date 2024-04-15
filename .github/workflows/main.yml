@@ -1,6 +1,7 @@
 name: build
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - release
@@ -12,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install Qt 5.15.2
-      uses: jurplel/install-qt-action@v4
+      uses: jurplel/install-qt-action@v3
       with:
         version: "5.15.2"
         modules: "qtwebengine"
@@ -33,7 +34,7 @@ jobs:
         brew install create-dmg
         create-dmg --volname "Jellyfin Media Player" --no-internet-enable "JellyfinMediaPlayer.dmg" "./build/output/Jellyfin Media Player.app"
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: macos
         path: ${{ github.workspace }}/JellyfinMediaPlayer.dmg
@@ -43,7 +44,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install Qt 5.15.2
-      uses: jurplel/install-qt-action@v4
+      uses: jurplel/install-qt-action@v3
       with:
         version: "5.15.2"
         arch: "win64_msvc2019_64"
@@ -56,7 +57,7 @@ jobs:
         curl -L https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip > ninja.zip
         unzip ninja.zip
         mv ninja.exe build/
-        curl -L https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20231215/mpv-dev-x86_64-20231215-git-e9d0a31.7z > mpv.7z
+        curl -L https://github.com/iwalton3/mpv-winbuild-cmake/releases/download/v20230304-git-362256e/mpv-dev-x86_64-20230304-git-362256e.7z > mpv.7z
         7z x mpv.7z
         mkdir mpv
         mv include mpv
@@ -79,7 +80,7 @@ jobs:
         ninja windows_package
       shell: cmd
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: windows
         path: ${{ github.workspace }}/build/JellyfinMediaPlayer-*.exe
@@ -89,7 +90,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install Qt 5.15.2
-      uses: jurplel/install-qt-action@v4
+      uses: jurplel/install-qt-action@v3
       with:
         version: "5.15.2"
         arch: "win32_msvc2019"
@@ -102,7 +103,7 @@ jobs:
         curl -L https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip > ninja.zip
         unzip ninja.zip
         mv ninja.exe build/
-        curl -L https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20231215/mpv-dev-i686-20231215-git-e9d0a31.7z > mpv.7z
+        curl -L https://github.com/iwalton3/mpv-winbuild-cmake/releases/download/v20230304-git-362256e/mpv-dev-i686-20230304-git-362256e.7z > mpv.7z
         7z x mpv.7z
         mkdir mpv
         mv include mpv
@@ -125,7 +126,7 @@ jobs:
         ninja windows_package
       shell: cmd
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: windows-legacy32
         path: ${{ github.workspace }}/build/JellyfinMediaPlayer-*.exe
@@ -142,7 +143,7 @@ jobs:
         docker build -f deployment/Dockerfile.debian -t builddeb --build-arg TAG=${{ matrix.tag }} --build-arg IMG=ubuntu deployment
         docker run -v $(pwd)/deployment/dist:/dist -v $(pwd):/jellyfin -e TAG=${{ matrix.tag }} builddeb
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: ubuntu-${{ matrix.tag }}
         path: ${{ github.workspace }}/deployment/dist/*
@@ -159,7 +160,7 @@ jobs:
         docker build -f deployment/Dockerfile.debian -t builddeb --build-arg TAG=${{ matrix.tag }} deployment
         docker run -v $(pwd)/deployment/dist:/dist -v $(pwd):/jellyfin -e TAG=${{ matrix.tag }} builddeb
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: debian-${{ matrix.tag }}
         path: ${{ github.workspace }}/deployment/dist/*
