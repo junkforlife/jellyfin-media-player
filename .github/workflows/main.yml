@@ -34,7 +34,7 @@ jobs:
 #        brew install create-dmg
 #        create-dmg --volname "Jellyfin Media Player" --no-internet-enable "JellyfinMediaPlayer.dmg" "./build/output/Jellyfin Media Player.app"
 #    - name: Archive production artifacts
-#      uses: actions/upload-artifact@v3
+#      uses: actions/upload-artifact@v4
 #      with:
 #        name: macos
 #        path: ${{ github.workspace }}/JellyfinMediaPlayer.dmg
@@ -80,7 +80,7 @@ jobs:
         ninja windows_package
       shell: cmd
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows
         path: ${{ github.workspace }}/build/JellyfinMediaPlayer-*.exe
@@ -126,7 +126,7 @@ jobs:
 #        ninja windows_package
 #      shell: cmd
 #    - name: Archive production artifacts
-#      uses: actions/upload-artifact@v3
+#      uses: actions/upload-artifact@v4
 #      with:
 #        name: windows-legacy32
 #        path: ${{ github.workspace }}/build/JellyfinMediaPlayer-*.exe
@@ -143,7 +143,7 @@ jobs:
 #        docker build -f deployment/Dockerfile.debian -t builddeb --build-arg TAG=${{ matrix.tag }} --build-arg IMG=ubuntu deployment
 #        docker run -v $(pwd)/deployment/dist:/dist -v $(pwd):/jellyfin -e TAG=${{ matrix.tag }} builddeb
 #    - name: Archive production artifacts
-#      uses: actions/upload-artifact@v3
+#      uses: actions/upload-artifact@v4
 #      with:
 #        name: ubuntu-${{ matrix.tag }}
 #        path: ${{ github.workspace }}/deployment/dist/*
@@ -160,7 +160,7 @@ jobs:
 #        docker build -f deployment/Dockerfile.debian -t builddeb --build-arg TAG=${{ matrix.tag }} deployment
 #        docker run -v $(pwd)/deployment/dist:/dist -v $(pwd):/jellyfin -e TAG=${{ matrix.tag }} builddeb
 #    - name: Archive production artifacts
-#      uses: actions/upload-artifact@v3
+#      uses: actions/upload-artifact@v4
 #      with:
 #        name: debian-${{ matrix.tag }}
 #        path: ${{ github.workspace }}/deployment/dist/*
