@@ -118,6 +118,9 @@ class skipIntroPlugin {
                             return;
                         }
 
+                        const seconds = playbackManager.currentTime(player) / 1000;
+
+                        await injectSkipIntroHtml(); // I have trust issues
                         const skipIntro = document.querySelector(".skipIntro");
 
                         for (let key in skipSegments) {
@@ -126,28 +129,19 @@ class skipIntroPlugin {
                                 return;
                             }
 
-                            const seconds = playbackManager.currentTime(player) / 1000;
-
-                            await injectSkipIntroHtml(); // I have trust issues
-                            
                             // If the skip prompt should be shown, show it.
                             if (seconds >= segment.ShowSkipPromptAt && seconds < segment.HideSkipPromptAt) {
                                 skipIntro.classList.remove("hide");
-
-                                const skipButton = document.querySelector('.skipIntro .btnSkipIntro');
-                                if (!skipButton) {
-                                    return;
-                                }
 
                                 if (userInterfaceConfiguration) {
                                     currentSegment = key;
                                     switch (currentSegment) {
                                         case "Introduction":
-                                            skipButton.querySelector("#btnSkipSegmentText").textContent =
+                                            skipIntro.querySelector("#btnSkipSegmentText").textContent =
                                                 userInterfaceConfiguration.SkipButtonIntroText;
                                             break;
                                         case "Credits":
-                                            skipButton.querySelector("#btnSkipSegmentText").textContent =
+                                            skipIntro.querySelector("#btnSkipSegmentText").textContent =
                                                 userInterfaceConfiguration.SkipButtonEndCreditsText;
                                             break;
                                         default:
