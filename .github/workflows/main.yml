@@ -54,7 +54,7 @@ jobs:
         ./download_webclient.sh
         curl -L https://aka.ms/vs/17/release/vc_redist.x64.exe > vc_redist.x64.exe
         sed -i 's#C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Redist\\MSVC\\v142\\vcredist_x64.exe#'"$(readlink -f vc_redist.x64.exe | sed 's#/\([a-z]\)/#\1:\\#g' | tr '/' '\\' | sed 's/\\/\\\\/g')#g" bundle/win/Bundle.wxs
-        curl -L https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip > ninja.zip
+        curl -L https://github.com/ninja-build/ninja/releases/download/v1.12.0/ninja-win.zip > ninja.zip
         unzip ninja.zip
         mv ninja.exe build/
         curl -L https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20240418/mpv-dev-x86_64-20240418-git-dc632e1.7z > mpv.7z
@@ -62,11 +62,7 @@ jobs:
         mkdir mpv
         mv include mpv
         mv libmpv-2.dll mpv/mpv.dll
-        echo "LIBRARY MPV" > mpv.def.fixed
-        echo "EXPORTS" >> mpv.def.fixed
-        cat mpv.def >> mpv.def.fixed
-        mv mpv.def.fixed mpv.def
-        mv mpv.def libmpv.dll.a mpv/
+        mv libmpv.dll.a mpv/
         mv mpv build/
       shell: bash
     - name: Build
@@ -75,7 +71,7 @@ jobs:
         cd build
         set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\bin;%CD%
         cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt5_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/mpv.dll -DCMAKE_INSTALL_PREFIX=output ..
-        lib /def:mpv\mpv.def /out:mpv\mpv.dll.lib /MACHINE:X64
+        lib /out:mpv\mpv.dll.lib /MACHINE:X64
         ninja
         ninja windows_package
       shell: cmd
@@ -100,7 +96,7 @@ jobs:
 #        ./download_webclient.sh
 #        curl -L https://aka.ms/vs/17/release/vc_redist.x86.exe > vc_redist.x86.exe
 #        sed -i 's#C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Redist\\MSVC\\v142\\vcredist_x64.exe#'"$(readlink -f vc_redist.x86.exe | sed 's#/\([a-z]\)/#\1:\\#g' | tr '/' '\\' | sed 's/\\/\\\\/g')#g" bundle/win/Bundle.wxs
-#        curl -L https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip > ninja.zip
+#        curl -L https://github.com/ninja-build/ninja/releases/download/v1.12.0/ninja-win.zip > ninja.zip
 #        unzip ninja.zip
 #        mv ninja.exe build/
 #        curl -L https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20240418/mpv-dev-i686-20240418-git-dc632e1.7z > mpv.7z
