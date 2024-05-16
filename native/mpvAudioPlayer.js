@@ -289,6 +289,18 @@ class mpvAudioPlayer {
         }, {
             name: '2x',
             id: 2.0
+        }, {
+            name: '2.5x',
+            id: 2.5
+        }, {
+            name: '3x',
+            id: 3
+        }, {
+            name: '3.5x',
+            id: 3.5
+        }, {
+            name: '4x',
+            id: 4
         }];
     }
 
