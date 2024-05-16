@@ -78,7 +78,7 @@ jobs:
       run: |
         ./download_webclient.sh
         curl -L https://aka.ms/vs/17/release/vc_redist.x64.exe > vc_redist.x64.exe
-        sed -i 's#C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Redist\\MSVC\\v142\\vcredist_x64.exe#'"$(readlink -f vc_redist.x64.exe | sed 's#/\([a-z]\)/#\1:\\#g' | tr '/' '\\' | sed 's/\\/\\\\/g')#g" bundle/in/#Bundle.wxs
+        sed -i 's#C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Redist\\MSVC\\v142\\vcredist_x64.exe#'"$(readlink -f vc_redist.x64.exe | sed 's#/\([a-z]\)/#\1:\\#g' | tr '/' '\\' | sed 's/\\/\\\\/g')#g" bundle/win/#Bundle.wxs
         curl -L https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip > ninja.zip
         unzip ninja.zip
         mv ninja.exe build/
