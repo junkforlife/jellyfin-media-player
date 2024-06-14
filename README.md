@@ -2,17 +2,17 @@
 
 Desktop client using jellyfin-web with embedded MPV player. Supports Windows, Mac OS,
 and Linux. Media plays within the same window using the jellyfin-web interface unlike
-Jellyfin Desktop. Supports audio passthrough. Based on [Plex Media Player](https://github.com/plexinc/plex-media-player).
+Jellyfin Desktop. Supports audio passthrough.
 
 ![Screenshot of Jellyfin Media Player](https://raw.githubusercontent.com/iwalton3/mpv-shim-misc-docs/master/images/jmp-player-win.png)
 
 Downloads:
  - [Windows, Mac, and Linux Releases](https://github.com/jellyfin/jellyfin-media-player/releases)
+   - Note for Mac users: builds for Intel require macOS 12+ and Apple Silicon builds requires macOS 14+
  - [Flathub (Linux)](https://flathub.org/apps/details/com.github.iwalton3.jellyfin-media-player)
 
 Related Documents:
- - Web client: https://repo.jellyfin.org/releases/server/portable/versions/stable/web/
-     - Note: If you do not provide the web client, the application will use a fallback UI where the user must select a server which has a web client.
+ - Web client: Application uses server-provided web client.
  - Web client integration documentation: [for-web-developers.md](https://github.com/jellyfin/jellyfin-media-player/blob/master/for-web-developers.md)
  - API Docs in [client-api.md](https://github.com/jellyfin/jellyfin-media-player/blob/master/client-api.md)
  - Tip: For help building, look at the GitHub Actions file!
@@ -50,7 +50,7 @@ sudo ldconfig
 cd ~/jmp/
 git clone https://github.com/jellyfin/jellyfin-media-player.git
 cd jellyfin-media-player
-./download_webclient.sh
+mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local/ -G Ninja ..
 ninja
@@ -83,7 +83,7 @@ sudo ldconfig
 cd ~/jmp/
 git clone https://github.com/jellyfin/jellyfin-media-player.git
 cd jellyfin-media-player/
-./download_webclient.sh
+mkdir build
 cd build/
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local/ ..
 make -j`nproc`
@@ -113,7 +113,7 @@ You need to run these commands in git bash.
 ```bash
 git clone https://github.com/jellyfin/jellyfin-media-player
 cd jellyfin-media-player
-./download_webclient.sh
+mkdir build
 cd build
 ```
 
@@ -135,7 +135,7 @@ Then run the following commands (replace <QT_DIR> with your QT installation loca
 
 ```bash
 brew install mpv ninja
-./download_webclient.sh
+mkdir build
 cd build
 cmake -GNinja -DQTROOT=<QT_DIR> -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output ..
 ninja install
@@ -186,7 +186,7 @@ This file can also be printed at runtime when using the ``--licenses`` option.
 
 ## Unofficial Plugin Support
 
-You can enable experimental support for [Skip Intro](https://github.com/ConfusedPolarBear/intro-skipper) in client settings. These are included for convenience only and is not an endorsement or long-term commitment to ensure functionality. See `src/native` for details on what the plugins modify code-wise.
+You can enable experimental support for [Skip Intro](https://github.com/jumoog/intro-skipper/) in client settings. These are included for convenience only and is not an endorsement or long-term commitment to ensure functionality. See `src/native` for details on what the plugins modify code-wise.
 
 ## Known Issues
 
